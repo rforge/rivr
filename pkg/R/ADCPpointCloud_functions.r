@@ -25,15 +25,14 @@
 #i=1; j=1
 
 # Required packages:
-require(rgdal)
-require(R.matlab)
-require(geometry)
-require(sp)
-require(RColorBrewer)
-require(classInt)
-require(maptools)
-require(raster)
-#require(ggplots)
+# require(rgdal) require(R.matlab)
+# require(geometry)
+# require(sp)
+# require(RColorBrewer)
+# require(classInt)
+# require(maptools)
+# require(raster)
+# #require(ggplots)
 
 
 #Create point layers of flow direction and speed

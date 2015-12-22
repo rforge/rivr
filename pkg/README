@@ -1,0 +1,3 @@
+This is a package for modelling river bathymetry and flow fields developed by Claude Flener.
+
+At present, this is a quick packaging of source code that had been thus far only used locally by myself. The code needs cleaning up quite a bit to really make it suitable for packaging. In particular, the NAMESPACE needs to be a lot more specific. However, this is a quick'n'dirty implementation to get it readily available as a package for teaching purposes. It can always be improved later.

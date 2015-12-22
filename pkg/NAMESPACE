@@ -1,5 +1,18 @@
-# Default NAMESPACE created by R
-# Remove the previous line if you edit this file
+# This needs cleaning up.
 
-# Export all names
-exportPattern(".")
+import( rgdal, 
+        R.matlab, 
+        geometry, 
+        sp, 
+        RColorBrewer, 
+        classInt, 
+        maptools, 
+        raster
+)
+
+export( riv2FlowLayers,
+        riv2FlowPointCloud,
+        getGPSdata,
+        points2Plane,
+        addPlane.z
+)
