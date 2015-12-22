@@ -37,31 +37,30 @@
 
 #' riv2FlowLayers
 #'
-#' This function creates point layers of flow direction and speed, and
-#' bathymetry.
+#' This function creates point layers of flow direction, speed, and bathymetry based on RiverSurveyor ADCP data and, optionally, external GNSS data.
 #'
-#' Three flow layers are created: Surface, Depth-integrated (average), near-bed flow.
+#' Three flow layers are created: Surface, Depth-integrated (average), Near-bed flow.
 #'
-#' In addition, bathymetry is created: depth and bed elevation (and surface elevation for post-processing)
+#' In addition, bathymetry is created: depth and bed elevation (and surface elevation for post-processing purposes)
 #'
 #' @param path the path to the input files (default = working directory.) Automatically handles batch processing if path is a directory. 
-#' @note path: If you provide a full path to a RiverSurveyor *.mat file, that file will be used for processing and only the GNSS points form the external GNSS file (if applicable) will be used. If your measurement is split over several *.mat files, put them allin the same directory and put the path to the directory instead of a file. The function will the batch-process all *.mat files in that directory and combine the resulting points into one output file.
+#' @note path: If you provide a full path to a RiverSurveyor *.mat file, that file will be used for processing and only the GNSS points form the external GNSS file (if applicable) will be used. If your measurement is split over several *.mat files, put them all in the same directory and input the path to the directory instead of a file. The function will batch-process all *.mat files in that directory and combine the resulting points into one output file.
 #' @param externalGPS \code{GNSS} if external GNSS data is to be used for computing point locations (default = NULL)
 #' @param TimeShiftSecs Optional: an integer as the number of seconds to shift GNSS data, if not in UTC (default = 0)
 #' @param plane Optional: a dataFrame output by \code{points2Plane()}. (default = NULL)
 #' @note  If \code{plane} is provided, this adds theoretical surface elevations based on plane equation: surface.z and bed.z based on surface.z
 #' @param z.out Z coordinate of output file. Takes one of three strings as values: "Elevation", "plane.z", "bed.z" (default = "Elevation")
 #' @param out  Output filetype. can take either of these strings as values: "csv", "shape", "all" (default), "none"
-#' @note if out == "none", no output file is created but the spatialPointsDataFrame is returned on exit; all other options produce output files but return empty.
+#' @note if \code{out == "none"}, no output file is created but the spatialPointsDataFrame is returned on exit; all other options produce output files but return empty.
 #' @param outdir target directory for output files (default = ".")
 #' @param outfile Optional: a string as the file name base for output files 
-#' @note outfile defaults to NULL, meaning that the file name of the output file is automatically created form the first ADCP *.mat file used for input. 
+#' @note \code{outfile} defaults to NULL, meaning that the file name of the output file is automatically created form the first ADCP *.mat file used for input. 
 #' @param fileAppendix a string appendix to file name
-#' @note fileAppendix is intended to be used together with automatic file names (outfile=NULL) to allow customisation of file names while retaining the convenience of automatically generated file names
+#' @note fileAppendix is intended to be used together with automatic file names (outfile = NULL) to allow customisation of file names while retaining the convenience of automatically generated file names
 #' @param verbose logical, prints the first 100 lines of the result to screen (default =TRUE)
 #' @param plot logical, plots the points created. (default = TRUE)
 #' @param map logical , creates PDF-maps of the bathymetry and flow data (default = TRUE) 
-#' @return A spatialPointsDataFrame, or, a file containing 3D point data (XYZ) either as CSV, ESRI shape, or both (default). The flow and depth data, as well as a bunch of other variables from the ADCP are included to be used as attributes / scalar fields. 
+#' @return A \code{spatialPointsDataFrame}, or, a file containing 3D point data (XYZ) either as CSV, ESRI shape, or both (default). The flow and depth data, as well as a bunch of other variables from the ADCP are included to be used as attributes / scalar fields. 
 #' @author Claude Flener \email{claude.flener@@utu.fi}
 #' @export
 riv2FlowLayers <- function(path=getwd(), externalGPS=NULL, TimeShiftSecs=0, plane=NULL, z.out="Elevation", out="all", outdir=".", outfile=NULL, fileAppendix="", verbose=TRUE, plot=TRUE, map=TRUE){
@@ -324,7 +323,28 @@ detach(riv)
 
 
 
-
+#' riv2FlowPointCloud
+#'
+#' This function creates 3D point clouds of flow direction, speed, river bed and water surface based on RiverSurveyor ADCP data and, optionally, external GNSS data.
+#'
+#' @param path the path to the input files (default = working directory.) Automatically handles batch processing if path is a directory. 
+#' @note path: If you provide a full path to a RiverSurveyor *.mat file, that file will be used for processing and only the GNSS points form the external GNSS file (if applicable) will be used. If your measurement is split over several *.mat files, put them all in the same directory and input the path to the directory instead of a file. The function will batch-process all *.mat files in that directory and combine the resulting points into one output file.
+#' @param externalGPS \code{GNSS} if external GNSS data is to be used for computing point locations (default = NULL)
+#' @param TimeShiftSecs Optional: an integer as the number of seconds to shift GNSS data, if not in UTC (default = 0)
+#' @param plane Optional: a dataFrame output by \code{points2Plane()}. (default = NULL)
+#' @note  If \code{plane} is provided, this adds theoretical surface elevations based on plane equation: surface.z and bed.z based on surface.z
+#' @param z.out Z coordinate of output file. Takes one of three strings as values: "Elevation", "plane.z", "bed.z" (default = "Elevation")
+#' @param out  Output filetype. can take either of these strings as values: "csv", "shape", "all" (default), "none"
+#' @note if \code{out == "none"}, no output file is created but the spatialPointsDataFrame is returned on exit; all other options produce output files but return empty.
+#' @param outdir target directory for output files (default = ".")
+#' @param outfile Optional: a string as the file name base for output files 
+#' @note \code{outfile} defaults to NULL, meaning that the file name of the output file is automatically created form the first ADCP *.mat file used for input. 
+#' @param fileAppendix a string appendix to file name
+#' @note fileAppendix is intended to be used together with automatic file names (outfile = NULL) to allow customisation of file names while retaining the convenience of automatically generated file names
+#' @param verbose logical, prints the first 100 lines of the result to screen (default =TRUE)
+#' @return A \code{spatialPointsDataFrame}, or, a file containing 3D point data (XYZ) either as CSV, ESRI shape, or both (default). The flow and depth data, as well as a bunch of other variables from the ADCP are included to be used as attributes / scalar fields. 
+#' @author Claude Flener \email{claude.flener@@utu.fi}
+#' @export
 riv2FlowPointCloud <- function(path=getwd(), externalGPS=NULL, TimeShiftSecs=0, plane=NULL, z.out="Elevation", out="all", outdir=".", outfile=NULL, fileAppendix="", verbose=TRUE ){
     rivDat <- data.frame()
     #Set up matrix to fill with points
@@ -524,12 +544,19 @@ cat("dat: ", str(dat), "\n\n")
 
 
 
-#find the equation for fitting a plane:
-#ax +by + cz = d
-#points: XYZ coordinates of three points to compute the plane from (as data.frame)
+#' points2Plane 
+#'
+#' This function finds the equation for computing a plane based on three 3D points
+#'
+#' find the equation for fitting a plane: ax +by + cz = d
+#'
+#' @param points a \code{data.Frame} containing the coordinates of three points in XYZ format.
+#' @return a \code{vector} containing the cross-product of three vectors and the offset d
+#' @author Claude Flener \email{claude.flener@@utu.fi}
+#' @export
 #Requires package: geometry
 points2Plane <- function(points=NA){
-    require(geometry)
+#     require(geometry)
     cat(length(points))
     ifelse( c("x", "y", "z") %in% names(points),points, names(points) <- c("x", "y", "z"))
     attach(points)
