@@ -5,5 +5,5 @@ Title: River Research and Modelling
 Author: Claude Flener <claude.flener@utu.fi>
 Maintainer: Claude Flener <claude.flener@utu.fi>
 Description: rivR is a collection of river research related R functions, including modelling and calibration algorithms as well as spatial data processing functions for modelling bathymetry and multidimensional flow fields.
-License: GPL (>= 2)
+License: GPL (>= 3)
 
