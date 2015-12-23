@@ -16,7 +16,7 @@ riv2FlowLayers(path = getwd(), externalGPS = NULL, TimeShiftSecs = 0,
 
 \item{TimeShiftSecs}{Optional: an integer as the number of seconds to shift GNSS data, if not in UTC (default = 0)}
 
-\item{plane}{Optional: a dataFrame output by \code{points2Plane()}. (default = NULL)}
+\item{plane}{Optional: a dataFrame output by \code{addPlane.z()}. (default = NULL)}
 
 \item{z.out}{Z coordinate of output file. Takes one of three strings as values: "Elevation", "plane.z", "bed.z" (default = "Elevation")}
 
@@ -46,17 +46,20 @@ Three flow layers are created: Surface, Depth-integrated (average), Near-bed flo
 In addition, bathymetry is created: depth and bed elevation (and surface elevation for post-processing purposes)
 }
 \note{
-path: If you provide a full path to a RiverSurveyor *.mat file, that file will be used for processing and only the GNSS points form the external GNSS file (if applicable) will be used. If your measurement is split over several *.mat files, put them all in the same directory and input the path to the directory instead of a file. The function will batch-process all *.mat files in that directory and combine the resulting points into one output file.
+\code{path}: If you provide a full path to a RiverSurveyor *.mat file, that file will be used for processing and only the relevant GNSS points form the external GNSS file (if applicable) will be used. If your measurement is split over several *.mat files, put them all in the same directory and input the path to the directory instead of a file. The function will batch-process all *.mat files in that directory and combine the resulting points into one output file.
 
 If \code{plane} is provided, this adds theoretical surface elevations based on plane equation: surface.z and bed.z based on surface.z
 
-if \code{out == "none"}, no output file is created but the spatialPointsDataFrame is returned on exit; all other options produce output files but return empty.
+if \code{out == "none"}, no output file is created but the \code{spatialPointsDataFrame} is returned on exit; all other options produce output files but return empty.
 
 \code{outfile} defaults to NULL, meaning that the file name of the output file is automatically created form the first ADCP *.mat file used for input.
 
-fileAppendix is intended to be used together with automatic file names (outfile = NULL) to allow customisation of file names while retaining the convenience of automatically generated file names
+\code{fileAppendix} is intended to be used together with automatic file names (outfile == NULL) to allow customisation of file names while retaining the convenience of automatically generated file names
 }
 \author{
 Claude Flener \email{claude.flener@utu.fi}
+}
+\seealso{
+\code{\link{addPlane.z}}
 }
 

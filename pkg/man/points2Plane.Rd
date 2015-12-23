@@ -10,7 +10,7 @@ points2Plane(points = NA)
 \item{points}{a \code{data.Frame} containing the coordinates of three points in XYZ format.}
 }
 \value{
-a vector containing the cross-product of three vectors and the offset d
+a \code{vector} containing the cross-product of three vectors and the offset d
 }
 \description{
 This function finds the equation for computing a plane based on three 3D points

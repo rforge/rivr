@@ -134,8 +134,24 @@ getMonthSecs <- function(date, daysecs){
 # getMonthSecs(date,daysec)
 
 ########### ------------------------------------------
+#' getGPSdata 
+#'
+#' This function reads GNSS data with a GPS-time stamp from a text file and add month-seconds in UTC format. Depending on the time format used in the raw data, the time format is converted to UTC. Month-seconds are required for combining GNSS data with RiverSurveyor data.
+#'
+#' @param data a \code{string} containing the path to a text file containing GNSS coordinates and a time stamp.
+#' @note \code{data} should contain at least XYZ coordinates and a timestamp. Generally, these are GNSS coordinates from an external GNSS source. The best input data is a *.csv file with post-processed trajectories exported from Trimble Business Center using UTC time stamps in \code{local} format.
+#' @param GPStimeFormat a \code{string} indicating the timestamp format. The following strings are accepted: \cr "GPSsecs" if the timestamp is in raw GPS seconds, \cr "UTCsecs" if the time stamp is in UTC seconds, \cr "UTChhmmss" if the time stamp format is in UTC hours-minutes-seconds format (default).
+#' @note this function is primarily intended to import data exported form Trimble Business center as processed baseline trajectories with the times stamp in the form of date (DD.MM.YYYY) followed by time in UTC hhmmss.sss format. For instance: \code{19.11.2010,090720.500}
+#' @param tab.sep a \code{string} with the tab separator in the text file. Defaults to ",".
+#' @param GPS.UTC.leapSeconds Optional: an \code{integer numeral} specifying the number of leap seconds between GPS-time and UTC. This is only required if \code{GPStimeFormat == "GPSsecs"}.
+#' @note GPS leap seconds are introduced every now and then in order to align GPS time with UTC. It is not possible to include future leap seconds in the code. Therefore, any leap seconds need to be input by the user for the time period in question.
+#' @return a \code{data.Frame} containing the original coordinates and a \code{date} and a \code{UTC} column with the time stamp as month-seconds.
+#' @seealso \code{\link{points2Plane}}
+#' @author Claude Flener \email{claude.flener@@utu.fi}
+#' @export
+#'
 # Convert GPS data to UTC day seconds:
-getGPSdata <- function(data, GPStimeFormat ="UTChhmmss", tab.sep=","  ){
+getGPSdata <- function(data, GPStimeFormat ="UTChhmmss", tab.sep=",", GPS.UTC.leapSeconds =NULL  ){
     # cat(GPStimeFormat)
     data <- read.table(data, sep=tab.sep, header=TRUE)
         # d <- GPS$Da
