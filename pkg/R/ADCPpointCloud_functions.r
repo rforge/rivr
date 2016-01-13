@@ -546,6 +546,236 @@ cat("dat: ", str(dat), "\n\n")
 
 
 
+#The following was supposed to be a wrapper function for riv2FlowLayers
+#that limits the output to just bathymetry. Due to the stupid way that the
+#function includes all the map producing routines inside itself (very
+#clumsy!) it's easier to just copy the whole function and leave out the
+#superfluous code.
+# TODO: Separate the mapping code into a separate function that can be
+# called by riv2FlowLayers and riv2FlowPointCloud and rive2bathy.
+
+#' riv2bathy
+#'
+#' This function creates point layers of bathymetry based on RiverSurveyor ADCP data and, optionally, external GNSS data.
+#'
+#' Bathymetry is created as depth and bed elevation. Surface elevation is also included for post-processing purposes)
+#'
+#' @param path the path to the input files (default = working directory.) Automatically handles batch processing if path is a directory. 
+#' @note \code{path}: If you provide a full path to a RiverSurveyor *.mat file, that file will be used for processing and only the relevant GNSS points form the external GNSS file (if applicable) will be used. If your measurement is split over several *.mat files, put them all in the same directory and input the path to the directory instead of a file. The function will batch-process all *.mat files in that directory and combine the resulting points into one output file.
+#' @param externalGPS \code{GNSS} if external GNSS data is to be used for computing point locations (default = NULL)
+#' @param TimeShiftSecs Optional: an integer as the number of seconds to shift GNSS data, if not in UTC (default = 0)
+#' @param plane Optional: a dataFrame output by \code{addPlane.z()}. (default = NULL)
+#' @note  If \code{plane} is provided, this adds theoretical surface elevations based on plane equation: surface.z and bed.z based on surface.z
+#' @param z.out Z coordinate of output file. Takes one of three strings as values: "Elevation", "plane.z", "bed.z" (default = "Elevation")
+#' @param out  Output filetype. can take either of these strings as values: "csv", "shape", "all" (default), "none"
+#' @note if \code{out == "none"}, no output file is created but the \code{spatialPointsDataFrame} is returned on exit; all other options produce output files but return empty.
+#' @param outdir target directory for output files (default = ".")
+#' @param outfile Optional: a string as the file name base for output files 
+#' @note \code{outfile} defaults to NULL, meaning that the file name of the output file is automatically created form the first ADCP *.mat file used for input. 
+#' @param fileAppendix a string appendix to file name
+#' @note \code{fileAppendix} is intended to be used together with automatic file names (outfile == NULL) to allow customisation of file names while retaining the convenience of automatically generated file names
+#' @param verbose logical, prints the first 100 lines of the result to screen (default =TRUE)
+#' @param plot logical, plots the points created. (default = TRUE)
+#' @param map logical , creates PDF-maps of the bathymetry and flow data (default = TRUE) 
+#' @return A \code{spatialPointsDataFrame}, or, a file containing 3D point data (XYZ) either as CSV, ESRI shape, or both (default). The flow and depth data, as well as a bunch of other variables from the ADCP are included to be used as attributes / scalar fields. 
+#' @seealso \code{\link{addPlane.z}}
+#' @author Claude Flener \email{claude.flener@@utu.fi}
+#' @export
+riv2bathy <- function(path=getwd(), externalGPS=NULL, TimeShiftSecs=0, plane=NULL, z.out="Elevation", out="all", outdir=".", outfile=NULL, fileAppendix="", verbose=TRUE, plot=TRUE, map=TRUE){
+riv2FlowLayers <- function(path=getwd(), externalGPS=NULL, TimeShiftSecs=0, plane=NULL, z.out="Elevation", out="all", outdir=".", outfile=NULL, fileAppendix="", verbose=TRUE, plot=TRUE, map=TRUE){
+    rivDat <- data.frame()
+    pathnames <- batchFiles("mat", path=path)
+    #cat(pathnames)
+    for (path in pathnames) { # batch loop
+              cat("Reading MAT file: ", basename(path), "\n", sep="")
+        filename <- sub(".mat$|$","",basename(path))
+
+    riv <- readRivMat(path)
+        #cat("path :", path, "\n")
+        #cat("pathnames :", pathnames, "\n")
+        #cat("filename :", filename, "\n")
+    attach(riv)
+    # get basic values to include in output file:
+    UTC             <- unlist(GPS$Utc)
+    GpsGeoid        <- unlist(GPS$GpsGeoid)
+    depth           <- as.numeric( Summary$Depth )
+    Temperature     <- as.numeric( System$Temperature )
+    Sample          <- as.numeric( System$Sample )
+    sensorDepthSet  <- unlist(Setup$sensorDepth[1])
+    VBdepth         <- as.numeric( BottomTrack$VB.Depth )
+    BTdepth         <- as.numeric( BottomTrack$BT.Depth )
+    first           <- which(System$Step==3)[1] # first measurement in Transect
+    last            <- length(which(System$Step==3))
+    rows            <- dim(WaterTrack$Velocity)[1]
+    columns         <- dim(WaterTrack$Velocity)[2]
+    pixels          <- round(round(100*Summary$Cells * System$Cell.Size)/5)
+    max.pixels      <- max(pixels)
+    CellsNumber     <- length(Cells)
+    max.cells       <- max(Cells)
+    min.cells       <- min(Cells)
+    total.cells     <- sum(Cells)
+
+    #set up output dataframe
+    dat <- data.frame(
+                      UTC               = UTC,
+                      depth             = depth,
+                      Temperature       = Temperature,
+                      Sample            = Sample,
+                      sensDpthSet       = sensorDepthSet,
+                      VBdepth           = VBdepth,
+                      BTdepth           = BTdepth,
+                      #snsDpthSet        = sensorDepthSet,
+                      Temp              = Temperature,
+                      Cells             = Cells,
+                      )
+
+    if(!is.null(externalGPS)){
+        # merge riv data with external (RTK)GPS data)
+        rivMonthSecs <- getRivMonthSecs(path, UTC)
+        rivMonthSecs <- rivMonthSecs + TimeShiftSecs
+        dat <- cbind(rivMonthSecs, dat)
+        #cat(str(externalGPS), "\n")
+        #cat(str(dat), "\n")
+
+            #Check for duplicates
+            duplicates <- length(which(duplicated(externalGPS$monthSec))) 
+            if(duplicates != 0){
+                warning(c("Duplicate monthSeconds in GPS data.\n  Automatically removing ", duplicates," duplicates\n"), immediate.=TRUE)
+                externalGPS <- externalGPS[ which(!duplicated(externalGPS$monthSec)) , ]
+            } 
+
+        dat <- merge(externalGPS, dat, by.x="monthSec", by.y="rivMonthSecs")
+        if(dim(dat)[1]==0){
+          warning(c("No points remaining after merging RiverSurveyor file ", basename(path),  " with GNSS data.\n"), immediate.=TRUE)
+        #}
+          #if(match(path, pathnames) < length(pathnames)){
+          if(length(pathnames) > 1){
+            detach(riv)        
+            next          
+          }else{
+            detach(riv)        
+            return
+          }
+        }
+
+        # add bed elevation based on external GPS data if no theoretical
+        # plane is provided
+        if(is.null(externalGPS$plane.z)){
+            dat$bed.z <- dat$Elevation - dat$depth
+        }else{
+        #cat(str(dat), "\n")
+            dat$bed.z <- dat$plane.z - dat$depth
+        }
+
+        #cat(str(dat), "\n")
+    }else{
+        # Extract RiverSurveyor's internal GPS data
+        rivGPSdata <- data.frame(   Easting <-unlist(GPS$UTM[,1])       ,
+                                    Northing <-unlist(GPS$UTM[,2])      ,
+                                    Altitude <-unlist(GPS$Altitude)     ,
+                                    EllGRS80 <- Altitude+GpsGeoid       ,
+                                    Satellites <-unlist(GPS$Satellites) ,
+                                    HDOP <-unlist(GPS$HDOP)             ,
+                                    GPSqual <-unlist(GPS$GPS.Quality)   )
+        dat <- cbind(rivGPSdata, dat)
+        # add bed elevation based on internal track data if no theoretical
+        # plane is provided
+        if(is.null(plane)){
+            dat$bed.z <- dat$EllGRS80 - dat$depth
+        }else{
+        dat <- addPlane.z(dat,plane)
+        #cat(str(dat), "\n")
+            dat$bed.z <- dat$plane.z - dat$depth
+        }
+
+
+    }
+
+        #cat(str(dat), "\n")
+
+    if(plot){ # plot intermediate data in loop
+         coord <- SpatialPoints(data.frame(dat$Easting, dat$Northing))
+         rivgpsSP <- SpatialPointsDataFrame(data=dat, coords=coord)
+         plot(rivgpsSP, pch=20, main= basename(path))
+         legend("topright", basename(path), bty="n")         
+    }
+
+ rivDat <- rbind(rivDat, dat)
+        dat <- NA
+detach(riv)
+      } # ends batch loop
+
+    dat <- rivDat
+
+
+        # Write shape file
+            # create coordinates
+    if(z.out=="Elevation") coord <- SpatialPoints(data.frame(dat$Easting, dat$Northing, dat$Elevation))
+    if(z.out=="plane.z") coord <- SpatialPoints(data.frame(dat$Easting, dat$Northing, dat$plane.z))
+    if(z.out=="bed.z") coord <- SpatialPoints(data.frame(dat$Easting, dat$Northing, dat$bed.z))
+
+    rivgpsSP <- SpatialPointsDataFrame(data=dat, coords=coord)
+
+    if(is.null(outfile)) outfile <- sub(".mat$|$","",basename(path))
+
+    if(plot) plot(rivgpsSP, pch=20, main=outfile) # plot final data
+
+        if(map){
+            # Plot points resulting points:
+            colors <- brewer.pal(7, "Blues")
+            # colors <- rev( colors ) # reverse color palette
+            #set breaks for the 7 colors 
+            brks<-classIntervals(rivgpsSP$depth, n=7, style="quantile")
+            brks<- brks$brks
+            #plot the map
+            plot(rivgpsSP, col=colors[findInterval(rivgpsSP$depth, brks,all.inside=TRUE)], axes=F, pch=20)
+            #add a legend
+            legend("bottomleft", legend=leglabs(round(brks, 1)), fill=colors, bty="n",x.intersp = .5, y.intersp = .8, cex=0.8, title="depth (m)", inset=c(0.02,0.1))
+            plotwidth <- max(rivgpsSP@coords[,1]) - min(rivgpsSP@coords[,1])
+            plotheight <- max(rivgpsSP@coords[,2]) - min(rivgpsSP@coords[,2])
+            maxplotdim <- max(c(plotwidth, plotheight))
+            ifelse(maxplotdim %/% 100 > 10 ,scalebarlength <- maxplotdim %/% 1000 *200,scalebarlength <- maxplotdim %/% 100 *20) 
+            scalebar(scalebarlength, type='bar', divs=4, below="m", adj=c(0,-1.5) , cex=0.75)
+            dev.print(pdf, paste(outdir,"/", outfile, fileAppendix,".depth_map.pdf",sep=""))
+            
+            # plot the depth-averaged velocities
+            colors <- brewer.pal(7, "YlOrRd")
+            # colors <- rev( colors ) # reverse color palette
+            #set breaks for the 7 colors 
+            brks<-classIntervals(rivgpsSP$DA.VelMagn, n=7, style="quantile")
+            brks<- brks$brks
+            #plot the map
+            plot(rivgpsSP, col=colors[findInterval(rivgpsSP$DA.VelMagn, brks,all.inside=TRUE)], axes=F, pch=20)
+            #add a legend
+            legend("bottomleft", legend=leglabs(round(brks, 1)), fill=colors, bty="n",x.intersp = .5, y.intersp = .8, cex=0.8, title="velocity (m/s)", inset=c(0.02,0.1))
+            #add a scale bar
+            plotwidth <- max(rivgpsSP@coords[,1]) - min(rivgpsSP@coords[,1])
+            plotheight <- max(rivgpsSP@coords[,2]) - min(rivgpsSP@coords[,2])
+            maxplotdim <- max(c(plotwidth, plotheight))
+            ifelse(maxplotdim %/% 100 > 10 ,scalebarlength <- maxplotdim %/% 1000 *200,scalebarlength <- maxplotdim %/% 100 *20) 
+            scalebar(scalebarlength, type='bar', divs=4, below="m", adj=c(0,-1.5) , cex=0.75)
+            #print to pdf 
+            dev.print(pdf, paste(outdir,"/", outfile, fileAppendix,".velocity_map.pdf",sep=""))
+        }
+
+        # Write CSV file
+            if (out == "csv" || out== "all"){
+            write.table(rivgpsSP@data, paste(outdir, "/", outfile, fileAppendix, ".csv", sep="" ), sep = ",",  row.names=FALSE, col.names=TRUE)
+            }
+    if (out == "shape" || out== "all"){
+                writeOGR(rivgpsSP, outdir , paste(outfile, fileAppendix, sep="")  , driver="ESRI Shapefile", layer_options="POINTZ")
+            }
+        if(verbose) print(rivgpsSP@data, max=50)
+        #ifelse(out=="none", return(rivgpsSP), return())
+
+       
+
+
+        return(rivgpsSP) 
+}
+
+
+
 
 #' points2Plane 
 #'
