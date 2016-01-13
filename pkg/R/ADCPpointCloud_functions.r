@@ -582,7 +582,6 @@ cat("dat: ", str(dat), "\n\n")
 #' @author Claude Flener \email{claude.flener@@utu.fi}
 #' @export
 riv2bathy <- function(path=getwd(), externalGPS=NULL, TimeShiftSecs=0, plane=NULL, z.out="Elevation", out="all", outdir=".", outfile=NULL, fileAppendix="", verbose=TRUE, plot=TRUE, map=TRUE){
-riv2FlowLayers <- function(path=getwd(), externalGPS=NULL, TimeShiftSecs=0, plane=NULL, z.out="Elevation", out="all", outdir=".", outfile=NULL, fileAppendix="", verbose=TRUE, plot=TRUE, map=TRUE){
     rivDat <- data.frame()
     pathnames <- batchFiles("mat", path=path)
     #cat(pathnames)
@@ -825,6 +824,4 @@ addPlane.z <- function(data, plane){
            data$plane.z <- -plane[1]/plane[3]*data$Easting + -plane[2]/plane[3]*data$Northing + plane[4]/plane[3]
         #cat(dat$surface, "\n")
     return(data)
-
 }
-
