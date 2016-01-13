@@ -25,7 +25,8 @@
 #i=1; j=1
 
 # Required packages:
-# require(rgdal) require(R.matlab)
+# require(rgdal) 
+# require(R.matlab)
 # require(geometry)
 # require(sp)
 # require(RColorBrewer)

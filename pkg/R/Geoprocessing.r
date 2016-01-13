@@ -342,7 +342,7 @@ mergeSP <-  function(x, y=NA){
         #
         # Pulmanki_Siltasarkka_up_20100526195825        21.74
         # Teno_Duskanguoika_20100527152936              22.34
-        # Teno_Nuorgam_Alaköngäs_Down_20100528173717    22.02
+        # Teno_Nuorgam_Alakongas_Down_20100528173717    22.02
         # Teno_Nuorgam_Koulu_20100528141901             21.96
         # Teno_Nuorgam_raja_20100528163254              21.89
         # Teno_Utsjoki_Muinaiskalmisto_20100525114020   22.67
