@@ -32,7 +32,7 @@ riv2bathy(path = getwd(), externalGPS = NULL, TimeShiftSecs = 0,
 
 \item{plot}{logical, plots the points created. (default = TRUE)}
 
-\item{map}{logical , creates PDF-maps of the bathymetry and flow data (default = TRUE)}
+\item{map}{logical , creates a PDF-map of the bathymetry data points (default = TRUE)}
 }
 \value{
 A \code{spatialPointsDataFrame}, or, a file containing 3D point data (XYZ) either as CSV, ESRI shape, or both (default). The flow and depth data, as well as a bunch of other variables from the ADCP are included to be used as attributes / scalar fields.
