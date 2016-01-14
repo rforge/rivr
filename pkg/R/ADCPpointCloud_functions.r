@@ -609,6 +609,7 @@ riv2Bathy <- function(path=getwd(), externalGPS=NULL, TimeShiftSecs=0, plane=NUL
     columns         <- dim(WaterTrack$Velocity)[2]
     pixels          <- round(round(100*Summary$Cells * System$Cell.Size)/5)
     max.pixels      <- max(pixels)
+    Cells           <- as.numeric( Summary$Cells )
     CellsNumber     <- length(Cells)
     max.cells       <- max(Cells)
     min.cells       <- min(Cells)
@@ -625,7 +626,7 @@ riv2Bathy <- function(path=getwd(), externalGPS=NULL, TimeShiftSecs=0, plane=NUL
                       BTdepth           = BTdepth,
                       #snsDpthSet        = sensorDepthSet,
                       Temp              = Temperature,
-                      Cells             = Cells,
+                      Cells             = Cells
                       )
 
     if(!is.null(externalGPS)){
