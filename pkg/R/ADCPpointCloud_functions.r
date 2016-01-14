@@ -576,7 +576,7 @@ cat("dat: ", str(dat), "\n\n")
 #' @note \code{fileAppendix} is intended to be used together with automatic file names (outfile == NULL) to allow customisation of file names while retaining the convenience of automatically generated file names
 #' @param verbose logical, prints the first 100 lines of the result to screen (default =TRUE)
 #' @param plot logical, plots the points created. (default = TRUE)
-#' @param map logical , creates PDF-maps of the bathymetry and flow data (default = TRUE) 
+#' @param map logical , creates a PDF-map of the bathymetry data points (default = TRUE) 
 #' @return A \code{spatialPointsDataFrame}, or, a file containing 3D point data (XYZ) either as CSV, ESRI shape, or both (default). The flow and depth data, as well as a bunch of other variables from the ADCP are included to be used as attributes / scalar fields. 
 #' @seealso \code{\link{addPlane.z}}
 #' @author Claude Flener \email{claude.flener@@utu.fi}
@@ -737,24 +737,7 @@ detach(riv)
             scalebar(scalebarlength, type='bar', divs=4, below="m", adj=c(0,-1.5) , cex=0.75)
             dev.print(pdf, paste(outdir,"/", outfile, fileAppendix,".depth_map.pdf",sep=""))
             
-            # plot the depth-averaged velocities
-            colors <- brewer.pal(7, "YlOrRd")
-            # colors <- rev( colors ) # reverse color palette
-            #set breaks for the 7 colors 
-            brks<-classIntervals(rivgpsSP$DA.VelMagn, n=7, style="quantile")
-            brks<- brks$brks
-            #plot the map
-            plot(rivgpsSP, col=colors[findInterval(rivgpsSP$DA.VelMagn, brks,all.inside=TRUE)], axes=F, pch=20)
-            #add a legend
-            legend("bottomleft", legend=leglabs(round(brks, 1)), fill=colors, bty="n",x.intersp = .5, y.intersp = .8, cex=0.8, title="velocity (m/s)", inset=c(0.02,0.1))
-            #add a scale bar
-            plotwidth <- max(rivgpsSP@coords[,1]) - min(rivgpsSP@coords[,1])
-            plotheight <- max(rivgpsSP@coords[,2]) - min(rivgpsSP@coords[,2])
-            maxplotdim <- max(c(plotwidth, plotheight))
-            ifelse(maxplotdim %/% 100 > 10 ,scalebarlength <- maxplotdim %/% 1000 *200,scalebarlength <- maxplotdim %/% 100 *20) 
-            scalebar(scalebarlength, type='bar', divs=4, below="m", adj=c(0,-1.5) , cex=0.75)
-            #print to pdf 
-            dev.print(pdf, paste(outdir,"/", outfile, fileAppendix,".velocity_map.pdf",sep=""))
+
         }
 
         # Write CSV file
