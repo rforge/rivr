@@ -17,6 +17,9 @@ a \code{data.Frame} containing the original coordinates and one \code{plane.z} c
 \description{
 This function adds elevations based on fitted plane
 }
+\note{
+\code{data} should contain at least XY coordinates, but can contain XYZ coordinates. Generally, these are GNSS coordinates from an external GNSS source. The coordinates will be preserved and the \code{plane.z} will be added.
+}
 \author{
 Claude Flener \email{claude.flener@utu.fi}
 }

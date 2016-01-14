@@ -554,7 +554,7 @@ cat("dat: ", str(dat), "\n\n")
 # TODO: Separate the mapping code into a separate function that can be
 # called by riv2FlowLayers and riv2FlowPointCloud and rive2bathy.
 
-#' riv2bathy
+#' riv2Bathy
 #'
 #' This function creates point layers of bathymetry based on RiverSurveyor ADCP data and, optionally, external GNSS data.
 #'
@@ -581,7 +581,7 @@ cat("dat: ", str(dat), "\n\n")
 #' @seealso \code{\link{addPlane.z}}
 #' @author Claude Flener \email{claude.flener@@utu.fi}
 #' @export
-riv2bathy <- function(path=getwd(), externalGPS=NULL, TimeShiftSecs=0, plane=NULL, z.out="Elevation", out="all", outdir=".", outfile=NULL, fileAppendix="", verbose=TRUE, plot=TRUE, map=TRUE){
+riv2Bathy <- function(path=getwd(), externalGPS=NULL, TimeShiftSecs=0, plane=NULL, z.out="Elevation", out="all", outdir=".", outfile=NULL, fileAppendix="", verbose=TRUE, plot=TRUE, map=TRUE){
     rivDat <- data.frame()
     pathnames <- batchFiles("mat", path=path)
     #cat(pathnames)
@@ -792,7 +792,7 @@ points2Plane <- function(points=NA){
 #' This function adds elevations based on fitted plane
 #'
 #' @param data a \code{data.Frame} containing the coordinates of the points to be fitted to the plane.
-#' @note \code{data} should contain at least XY coordinates, but can contain XYZ coordinates. Generally, these are GNSS coordinates from an external GNSS source. The coordinates will be preserved and the \code{plane.z) will be added.
+#' @note \code{data} should contain at least XY coordinates, but can contain XYZ coordinates. Generally, these are GNSS coordinates from an external GNSS source. The coordinates will be preserved and the \code{plane.z} will be added.
 #' @param plane a \code{vector} created by the \code{points2Plane} function
 #' @return a \code{data.Frame} containing the original coordinates and one \code{plane.z} column with the plane elevation for each point.
 #' @seealso \code{\link{points2Plane}}
