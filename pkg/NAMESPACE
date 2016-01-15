@@ -12,6 +12,7 @@ import( rgdal,
 
 export( riv2FlowLayers,
         riv2FlowPointCloud,
+        riv2Bathy,
         getGPSdata,
         points2Plane,
         addPlane.z
