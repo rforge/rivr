@@ -1,6 +1,6 @@
 Package: RiverSurvey
 Version: 0.3
-Date: 2015-12-21
+Date: 2016-01-15
 Title: River Research and Modelling
 Author: Claude Flener <claude.flener@utu.fi>
 Maintainer: Claude Flener <claude.flener@utu.fi>
@@ -10,10 +10,11 @@ Description: A collection of river research related R functions,
 License: GPL (>= 3)
 Depends:
     R (>= 3.1.2),
+Imports:
     rgdal,
     R.matlab,
-    geometry,
     sp,
+    geometry,
     RColorBrewer,
     classInt,
     maptools,

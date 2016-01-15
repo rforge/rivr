@@ -38,12 +38,7 @@ riv2FlowLayers(path = getwd(), externalGPS = NULL, TimeShiftSecs = 0,
 A \code{spatialPointsDataFrame}, or, a file containing 3D point data (XYZ) either as CSV, ESRI shape, or both (default). The flow and depth data, as well as a bunch of other variables from the ADCP are included to be used as attributes / scalar fields.
 }
 \description{
-This function creates point layers of flow direction, speed, and bathymetry based on RiverSurveyor ADCP data and, optionally, external GNSS data.
-}
-\details{
-Three flow layers are created: Surface, Depth-integrated (average), Near-bed flow.
-
-In addition, bathymetry is created: depth and bed elevation (and surface elevation for post-processing purposes)
+riv2FlowLayers
 }
 \note{
 \code{path}: If you provide a full path to a RiverSurveyor *.mat file, that file will be used for processing and only the relevant GNSS points form the external GNSS file (if applicable) will be used. If your measurement is split over several *.mat files, put them all in the same directory and input the path to the directory instead of a file. The function will batch-process all *.mat files in that directory and combine the resulting points into one output file.

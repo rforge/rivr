@@ -212,14 +212,14 @@ objName2string <- function(x){
 ### csv2shape does exactly what it says on the tin
 # x = csv file with coordinates
 # returns point shape file
-csv2shape <- function(dat, sep="\t"){
-        x<- read.table(dat, paste(path.expand(path), "/", filename, ".csv", sep=""), sep = "\t",  row.names=FALSE, col.names=c("X", "Y", "Z"))
-# TODO: make coordinate structure
-#         write shape file using analog of writeSP2shape with , layer_options="POINTZ" option
-#         writeSP2shape()
-            # write shape file as 3D points (not supported yet by rgdal)
-            # writeOGR(xSP, getwd(), "TanaBru_filtered_merged", driver="ESRI Shapefile", layer_options="POINTZ")
-}
+#csv2shape <- function(dat, sep="\t"){
+        #x<- read.table(dat, paste(path.expand(path), "/", filename, ".csv", sep=""), sep = "\t",  row.names=FALSE, col.names=c("X", "Y", "Z"))
+## TODO: make coordinate structure
+##         write shape file using analog of writeSP2shape with , layer_options="POINTZ" option
+##         writeSP2shape()
+            ## write shape file as 3D points (not supported yet by rgdal)
+            ## writeOGR(xSP, getwd(), "TanaBru_filtered_merged", driver="ESRI Shapefile", layer_options="POINTZ")
+#}
 
 
 
@@ -496,7 +496,7 @@ adjustRivSurv.GPSwaterSurface.vOffset <- function( elevation, depth, RS.model="M
                 sensor2GPSlength <- 0.275 + 0.2523
                 # M9 length = 25.23 cm, Top of sensor unit to bottom of GPS is 27.5 cm
             } else
-        if (RSmodel=="S5"){
+        if (RS.model=="S5"){
                 sensor2GPSlength <- 0.275 + 0.2536
                 # S5 length = 25.36 cm, Top of sensor unit to bottom of GPS is 27.5 cm
         }

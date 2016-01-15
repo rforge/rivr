@@ -1,19 +1,16 @@
-# This needs cleaning up.
 
-import( rgdal, 
-        R.matlab, 
-        geometry, 
-        sp, 
-        RColorBrewer, 
-        classInt, 
-        maptools, 
-        raster
-)
+export(addPlane.z)
+export(getGPSdata)
+export(points2Plane)
+export(riv2Bathy)
+export(riv2FlowLayers)
+export(riv2FlowPointCloud)
 
-export( riv2FlowLayers,
-        riv2FlowPointCloud,
-        riv2Bathy,
-        getGPSdata,
-        points2Plane,
-        addPlane.z
-)
+import(rgdal)
+import(R.matlab)
+import(sp)
+import(geometry)
+import(RColorBrewer)
+import(classInt)
+import(maptools)
+import(raster)

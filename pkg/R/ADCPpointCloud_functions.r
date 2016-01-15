@@ -25,18 +25,20 @@
 #i=1; j=1
 
 # Required packages:
-# require(rgdal) 
-# require(R.matlab)
-# require(geometry)
-# require(sp)
-# require(RColorBrewer)
-# require(classInt)
-# require(maptools)
-# require(raster)
-# #require(ggplots)
+
 
 
 #' riv2FlowLayers
+#'
+#' @import rgdal 
+#' @import R.matlab
+#' @import geometry
+#' @import sp
+#' @import RColorBrewer
+#' @import classInt
+#' @import maptools
+#' @import raster
+#' @import ggplots'
 #'
 #' This function creates point layers of flow direction, speed, and bathymetry based on RiverSurveyor ADCP data and, optionally, external GNSS data.
 #'
